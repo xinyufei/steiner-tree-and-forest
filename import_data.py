@@ -1,7 +1,7 @@
 import networkx as nx
 
 
-def read_data(file_name):
+def read_data(file_name, mode = 'tree'):
     dataset = []
     file = open(file_name, mode='r')
     for line in file:
@@ -23,4 +23,5 @@ def read_data(file_name):
             t_list.append(int(data[1]))
 
     # print(list(g.nodes), list(g.edges), t_list)
+
     return g, t_list
