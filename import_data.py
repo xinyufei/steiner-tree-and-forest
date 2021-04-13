@@ -1,7 +1,7 @@
 import networkx as nx
 
 
-def read_data(file_name, mode = 'tree'):
+def read_data(file_name, mode='tree'):
     dataset = []
     file = open(file_name, mode='r')
     for line in file:
