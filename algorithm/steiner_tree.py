@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+import itertools
 
 
 def steiner_tree(g, t_list):
@@ -47,16 +48,30 @@ def steiner_tree_lb(g, t_list):
     :param t_list: terminal list (list)
     :return: lower bound of Steiner tree problem (double)
     """
-    # find d_min(K)
-    min_length = np.infty
-    for index1 in range(len(t_list)):
-        t1 = t_list[index1]
-        for index2 in range(index1 + 1, len(t_list)):
-            t2 = t_list[index2]
-            length = nx.shortest_path_length(g, source=t1, target=t2, weight='weight')
-            if min_length >= length:
-                min_length = length
+    # compute pairwise length
+    length_set = {}
+    dataset = itertools.combinations(set(t_list), 2)
+    for data in dataset:
+        length_set[(min(data[0], data[1]), max(data[0], data[1]))] = nx.shortest_path_length(
+            g, source=data[0], target=data[1], weight='weight')
+
+    # iterate over K
+    lb_all_subset = []
+    for s in range(2, len(t_list) + 1):
+        dataset = itertools.combinations(set(t_list), s)
+        for data in dataset:
+            # find d_min(K)
+            min_length = np.infty
+            data_list = list(data)
+            for index1 in range(len(data_list)):
+                t1 = data_list[index1]
+                for index2 in range(index1 + 1, len(data_list)):
+                    t2 = data_list[index2]
+                    length = length_set[(min(t1, t2), max(t1, t2))]
+                    if min_length >= length:
+                        min_length = length
+            lb_all_subset.append(min_length / 2 * len(data_list))
     # computer lower bound
-    lb = min_length / 2 * len(t_list)
+    lb = max(lb_all_subset)
 
     return lb
